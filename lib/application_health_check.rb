@@ -1,10 +1,10 @@
 # Copyright (c) 2010-2013 Ian Heggie, released under the MIT license.
 # See MIT-LICENSE for details.
 
-module HealthCheck
+module ApplicationHealthCheck
 
   class Engine < Rails::Engine
-    cattr_accessor :routes_explicitly_defined 
+    cattr_accessor :routes_explicitly_defined
   end
 
   # Text output upon success
@@ -87,15 +87,15 @@ module HealthCheck
 
 end
 
-require 'health_check/version'
-require 'health_check/base_health_check'
-require 'health_check/resque_health_check'
-require 'health_check/s3_health_check'
-require 'health_check/redis_health_check'
-require 'health_check/sidekiq_health_check'
-require 'health_check/utils'
-require 'health_check/health_check_controller'
-require 'health_check/health_check_routes'
-require 'health_check/middleware_health_check'
+require 'application_health_check/version'
+require 'application_health_check/base_health_check'
+require 'application_health_check/resque_health_check'
+require 'application_health_check/s3_health_check'
+require 'application_health_check/redis_health_check'
+require 'application_health_check/sidekiq_health_check'
+require 'application_health_check/utils'
+require 'application_health_check/health_check_controller'
+require 'application_health_check/health_check_routes'
+require 'application_health_check/middleware_health_check'
 
 # vi: sw=2 sm ai:

@@ -1,4 +1,4 @@
-module HealthCheck
+module ApplicationHealthCheck
   class SidekiqHealthCheck
     extend BaseHealthCheck
 

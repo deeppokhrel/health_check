@@ -1,7 +1,7 @@
 # Copyright (c) 2010-2013 Ian Heggie, released under the MIT license.
 # See MIT-LICENSE for details.
 
-module HealthCheck
+module ApplicationHealthCheck
   class Utils
 
     @@default_smtp_settings =
@@ -25,11 +25,11 @@ module HealthCheck
           when 'and', 'site'
             # do nothing
           when "database"
-            HealthCheck::Utils.get_database_version
+            ApplicationHealthCheck::Utils.get_database_version
           when "email"
-            errors << HealthCheck::Utils.check_email
+            errors << ApplicationHealthCheck::Utils.check_email
           when "emailconf"
-            errors << HealthCheck::Utils.check_email if HealthCheck::Utils.mailer_configured?
+            errors << ApplicationHealthCheck::Utils.check_email if ApplicationHealthCheck::Utils.mailer_configured?
           when "migrations", "migration"
             if defined?(ActiveRecord::Migration) and ActiveRecord::Migration.respond_to?(:check_pending!)
               # Rails 4+
@@ -39,45 +39,45 @@ module HealthCheck
                   errors << ex.message
               end
             else
-              database_version  = HealthCheck::Utils.get_database_version
-              migration_version = HealthCheck::Utils.get_migration_version
+              database_version  = ApplicationHealthCheck::Utils.get_database_version
+              migration_version = ApplicationHealthCheck::Utils.get_migration_version
               if database_version.to_i != migration_version.to_i
                 errors << "Current database version (#{database_version}) does not match latest migration (#{migration_version}). "
               end
             end
           when 'cache'
-            errors << HealthCheck::Utils.check_cache
+            errors << ApplicationHealthCheck::Utils.check_cache
           when 'resque-redis-if-present'
-            errors << HealthCheck::ResqueHealthCheck.check if defined?(::Resque)
+            errors << ApplicationHealthCheck::ResqueHealthCheck.check if defined?(::Resque)
           when 'sidekiq-redis-if-present'
-            errors << HealthCheck::SidekiqHealthCheck.check if defined?(::Sidekiq)
+            errors << ApplicationHealthCheck::SidekiqHealthCheck.check if defined?(::Sidekiq)
           when 'redis-if-present'
-            errors << HealthCheck::RedisHealthCheck.check if defined?(::Redis)
+            errors << ApplicationHealthCheck::RedisHealthCheck.check if defined?(::Redis)
           when 's3-if-present'
-            errors << HealthCheck::S3HealthCheck.check if defined?(::Aws)
+            errors << ApplicationHealthCheck::S3HealthCheck.check if defined?(::Aws)
           when 'resque-redis'
-            errors << HealthCheck::ResqueHealthCheck.check
+            errors << ApplicationHealthCheck::ResqueHealthCheck.check
           when 'sidekiq-redis'
-            errors << HealthCheck::SidekiqHealthCheck.check
+            errors << ApplicationHealthCheck::SidekiqHealthCheck.check
           when 'redis'
-            errors << HealthCheck::RedisHealthCheck.check
+            errors << ApplicationHealthCheck::RedisHealthCheck.check
           when 's3'
-            errors << HealthCheck::S3HealthCheck.check
+            errors << ApplicationHealthCheck::S3HealthCheck.check
           when "standard"
-            errors << HealthCheck::Utils.process_checks(HealthCheck.standard_checks, called_from_middleware)
+            errors << ApplicationHealthCheck::Utils.process_checks(ApplicationHealthCheck.standard_checks, called_from_middleware)
           when "middleware"
             errors << "Health check not called from middleware - probably not installed as middleware." unless called_from_middleware
           when "custom"
-            HealthCheck.custom_checks.each do |name, list|
+            ApplicationHealthCheck.custom_checks.each do |name, list|
               list.each do |custom_check|
                 errors << custom_check.call(self)
               end
             end
           when "all", "full"
-            errors << HealthCheck::Utils.process_checks(HealthCheck.full_checks, called_from_middleware)
+            errors << ApplicationHealthCheck::Utils.process_checks(ApplicationHealthCheck.full_checks, called_from_middleware)
           else
-            if HealthCheck.custom_checks.include? check
-               HealthCheck.custom_checks[check].each do |custom_check|
+            if ApplicationHealthCheck.custom_checks.include? check
+               ApplicationHealthCheck.custom_checks[check].each do |custom_check|
                  errors << custom_check.call(self)
                end
             else
@@ -100,7 +100,7 @@ module HealthCheck
     end
 
     def self.mailer_configured?
-      defined?(ActionMailer::Base) && (ActionMailer::Base.delivery_method != :smtp || HealthCheck::Utils.default_smtp_settings != ActionMailer::Base.smtp_settings)
+      defined?(ActionMailer::Base) && (ActionMailer::Base.delivery_method != :smtp || ApplicationHealthCheck::Utils.default_smtp_settings != ActionMailer::Base.smtp_settings)
     end
 
     def self.get_database_version
@@ -119,9 +119,9 @@ module HealthCheck
     def self.check_email
       case ActionMailer::Base.delivery_method
         when :smtp
-          HealthCheck::Utils.check_smtp(ActionMailer::Base.smtp_settings, HealthCheck.smtp_timeout)
+          ApplicationHealthCheck::Utils.check_smtp(ActionMailer::Base.smtp_settings, ApplicationHealthCheck.smtp_timeout)
         when :sendmail
-          HealthCheck::Utils.check_sendmail(ActionMailer::Base.sendmail_settings)
+          ApplicationHealthCheck::Utils.check_sendmail(ActionMailer::Base.sendmail_settings)
         else
           ''
       end

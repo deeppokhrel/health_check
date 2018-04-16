@@ -161,8 +161,8 @@ ActionMailer::Base.smtp_settings = { :address => "localhost", :port => 3555 }
 
 echo Adding an initializer for health_check gem ...
 mkdir -p config/initializers
-tee config/initializers/health_check.rb <<!
-HealthCheck.setup do |config|
+tee config/initializers/application_health_check.rb <<!
+ApplicationHealthCheck.setup do |config|
   config.success = "$success"
   config.smtp_timeout = 60.0
   config.http_status_for_error_text = 550
@@ -247,14 +247,14 @@ do
       echo ======== config/environments/$e.rb ================
       sed -i.bak -e 's/config.serve_static_assets = false/config.serve_static_assets = true   # NOTE: health_check test: changed to true/'  \
         -e 's/config.active_record.migration_error = :page_load/# & # NOTE: health_check test: commented out/'  \
-        config/environments/$e.rb 
+        config/environments/$e.rb
       cat config/environments/$e.rb || true
       echo
     fi
 done
 echo "============== config/environment.rb ============="
 cat config/environment.rb
-echo 
+echo
 
 echo ========================
 case $db in
@@ -264,7 +264,7 @@ case $db in
             echo
             export RAILS_ENV=$e RACK_ENV=$e
             echo "Jruby requires the database to be created before the server is started: running RAILS_ENV=$e rake db:migrate"
-            $rake db:migrate 
+            $rake db:migrate
             echo
       done
       ;;
@@ -349,11 +349,11 @@ class ExampleController < ApplicationController
   def index
     render :plain => 'example page'
   end
-  
+
   def catchall
     render :plain => 'catch all route'
   end
-  
+
 end
 
 EOF
@@ -373,7 +373,7 @@ case "$MIDDLEWARE" in
 
       echo "    # -----------------------------------------"
       echo "    # START OF SECTION FOR TESTING HEALTH_CHECK"
-      echo "    config.middleware.insert_after Rails::Rack::Logger, HealthCheck::MiddlewareHealthcheck"
+      echo "    config.middleware.insert_after Rails::Rack::Logger, ApplicationHealthCheck::MiddlewareHealthcheck"
       echo "    # END OF SECTION FOR TESTING HEALTH_CHECK"
       echo "    # ---------------------------------------"
       ruby -n -e 'print if /^  *end/..9999' config/application.rb-old | tee /tmp/t$$

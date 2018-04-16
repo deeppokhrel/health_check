@@ -1,2 +1,2 @@
-require 'health_check'
+require 'application_health_check'
 

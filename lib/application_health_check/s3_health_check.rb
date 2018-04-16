@@ -1,4 +1,4 @@
-module HealthCheck
+module ApplicationHealthCheck
   class S3HealthCheck
     extend BaseHealthCheck
 
@@ -8,7 +8,7 @@ module HealthCheck
           raise "Wrong configuration. Missing 'aws-sdk' gem"
         end
         return create_error 's3', 'Could not connect to aws' if aws_s3_client.nil?
-        HealthCheck.buckets.each do |bucket_name, permissions|
+        ApplicationHealthCheck.buckets.each do |bucket_name, permissions|
           if permissions.nil? # backward compatible
             permissions = [:R, :W, :D]
           end

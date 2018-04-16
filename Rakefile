@@ -15,7 +15,7 @@ begin
   require 'rdoc/task'
 
   Rake::RDocTask.new do |rdoc|
-    version = HealthCheck::VERSION
+    version = ApplicationHealthCheck::VERSION
 
     rdoc.rdoc_dir = 'rdoc'
     rdoc.title = "health_check #{version}"

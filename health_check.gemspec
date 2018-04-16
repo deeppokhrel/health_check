@@ -1,11 +1,11 @@
 # -*- encoding: utf-8 -*-
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-require 'health_check/version'
+require 'application_health_check/version'
 
 Gem::Specification.new do |gem|
   gem.name          = "health_check"
-  gem.version       = HealthCheck::VERSION
+  gem.version       = ApplicationHealthCheck::VERSION
   gem.required_rubygems_version = Gem::Requirement.new(">= 0") if gem.respond_to? :required_rubygems_version=
   gem.authors       = ["Ian Heggie"]
   gem.email         = ["ian@heggie.biz"]
